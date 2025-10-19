@@ -1,6 +1,6 @@
 # SG do VPC Link (associado aos ENIs do API Gateway)
 resource "aws_security_group" "vpclink" {
-  name   = "sg-vpclink"
+  name   = "vpclink"
   vpc_id = module.vpc.vpc_id
 
   egress {
@@ -14,7 +14,7 @@ resource "aws_security_group" "vpclink" {
 
 # SG do ALB (aceita trafego do SG do VPC Link na porta 80)
 resource "aws_security_group" "alb" {
-  name   = "sg-alb"
+  name   = "alb-internal"
   vpc_id = module.vpc.vpc_id
 
   ingress {
@@ -36,7 +36,7 @@ resource "aws_security_group" "alb" {
 
 # SG do servico ECS (aceita trafego do ALB na porta 3000)
 resource "aws_security_group" "svc" {
-  name   = "sg-ecs-svc"
+  name   = "ecs-service"
   vpc_id = module.vpc.vpc_id
 
   ingress {
