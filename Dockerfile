@@ -1,4 +1,4 @@
-# Imagem mínima, rápida e segura
+# Imagem minima, rapida e segura
 FROM node:20-alpine
 WORKDIR /app
 COPY app/package*.json ./

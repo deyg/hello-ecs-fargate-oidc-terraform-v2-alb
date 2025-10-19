@@ -18,18 +18,20 @@ jobs:
       - name: Configure AWS (OIDC)
         uses: aws-actions/configure-aws-credentials@v5
         with:
-          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/gha-oidc-terraform
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/gha-oidc-terraform
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # 1) Garante VPC/ECR/ECS/ALB/API
-      - name: Terraform apply infra
+      # 1) Prepara Terraform e garante repositorio ECR
+      - name: Terraform init
         working-directory: infra
-        run: |
-          terraform init -input=false
-          terraform apply -auto-approve -input=false
+        run: terraform init -input=false
+
+      - name: Terraform apply (ECR)
+        working-directory: infra
+        run: terraform apply -target=aws_ecr_repository.app -auto-approve -input=false
 
       # 2) Login ECR, build e push imagem
       - name: Login to ECR
