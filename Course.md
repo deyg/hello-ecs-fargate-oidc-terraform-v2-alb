@@ -1,4 +1,4 @@
-# Curso: Deploy de Aplicações Node.js no AWS ECS Fargate com GitHub Actions e Terraform
+﻿# Curso: Deploy de Aplicações Node.js no AWS ECS Fargate com GitHub Actions e Terraform
 
 ## Estrutura Geral
 
@@ -162,3 +162,99 @@ Cada módulo inclui objetivos claros, pré-requisitos, tempo estimado e entregá
 ---
 
 **Dica final:** incentive os alunos a manterem um diário de experimentos e erros encontrados durante o hands-on. Isso fixa o aprendizado e gera material para discussões em grupo.
+
+
+## Conteudo detalhado por modulo
+
+### Modulo 1
+- Principios de desenho: contrato de API, latencia, escalabilidade vertical x horizontal, blast radius, zonas de disponibilidade.
+- ALB vs NLB: camadas OSI, health checks, roteamento por path/host.
+- API Gateway HTTP: diferencas para REST/WS; estagios e implicacoes no path.
+- VPC Link: cenarios de uso; limites e custos.
+- ECS Fargate: isolamento, revisoes de task, deployment rolling.
+- ECR: imutabilidade por tag/sha.
+- Terraform/State: por que backends remotos e locks.
+- GHA OIDC: troca de tokens x chaves estaticas.
+- Entregavel: diagrama anotado da arquitetura.
+
+### Modulo 2
+- Ameaças comuns: chaves expostas, state no git, portas abertas.
+- OIDC trust policy: condicoes por repo/branch/environment.
+- Seguranca de rede: SGs encadeados (principio do menor privilegio).
+- Seguranca de dados: criptografia S3 e DynamoDB; versao/lock.
+- Hardening de IAM: de AdministratorAccess para policies especificas.
+- LGPD: dados pessoais vs dados tecnicos, minimizacao, logs.
+- Checklist: sem .tfstate no repo; sem tokens em YAML; secrets so via GitHub.
+
+### Modulo 3
+- Layout do repo e responsabilidades por pasta.
+- Convencoes de nome e sufixos (prod, dev, sandbox).
+- Padrao HCL multilinha, modulos oficiais, versions pinadas.
+- Variaveis x locals x outputs; quando usar cada um.
+- Boas praticas de revisao (terraform fmt/validate/plan).
+- Exercicios: esbocar arquivos que serao criados em cada pasta.
+
+### Modulo 4
+- Fluxo CI/CD: build idempotente, tag por SHA, reapply para trocar imagem.
+- configure-aws-credentials com id-token: rotacao automatica.
+- Estrategias de aprovacao/ambientes no GitHub (environments).
+- Estrutura de jobs/steps; cache e paralelismo (quando usar).
+- Teste pos-deploy: curl no endpoint em passo opcional.
+- Pitfalls: ordem apply x build; -target so quando necessario.
+
+### Modulo 5
+- Logs: stdout da task para CloudWatch (group/stream).
+- Metricas: ALB (5xx/target response time), API GW (4xx/5xx), ECS (CPU/Mem).
+- Alarmes: thresholds basicos e acao (SNS).
+- Rollback: fixar imagem anterior; revisar desired_count.
+- Documentacao viva: README, troubleshooting, runbooks.
+
+### Setup inicial
+- Criar repo; habilitar Actions; proteger branches.
+- Adicionar .gitignore (Terraform/Node).
+- Planejar nomes unicos para buckets/tabelas.
+- Validacao: git status limpo; nenhum .tfstate.
+
+### Modulo 6 (API)
+- Implementar rotas /, /hello, /health e suporte a API_STAGE.
+- Testes locais: curl http://localhost:3000/hello.
+- Erros comuns: porta ocupada; variavel PORT; encoding.
+- Entregavel: app sobe e responde JSON.
+
+### Modulo 7 (Docker)
+- Build de imagem e execucao local.
+- Imagem pequena: node:alpine; npm ci vs npm install; lockfile.
+- Healthcheck opcional no Dockerfile.
+- Entregavel: imagem executa e responde.
+
+### Modulo 8 (Bootstrap)
+- Criar S3/DynamoDB/OIDC role; variaveis gh_owner/gh_repo.
+- terraform init/apply; capturar outputs.
+- Verificar bucket versionado e tabela criada.
+- Entregavel: ARN da role, bucket e tabela ativos.
+
+### Modulo 9 (Infra)
+- VPC modulo oficial; NAT para pull da imagem.
+- SGs: vpclink -> alb:80 -> svc:3000.
+- ALB TG health_check em /health.
+- ECS: roles exec/task, task def, service com LB.
+- API HTTP: VPC Link, integracao no listener, stage.
+- Outputs: cluster, repo, URLs.
+- Testes: terraform plan/apply; curl via API.
+
+### Modulo 10 (Workflows)
+- deploy.yml: init/apply ECR, build/push, apply com TF_VAR_image_tag.
+- destroy.yml: workflow_dispatch protegido por environment.
+- Secrets: ACCOUNT_ID; demais via env.
+- Validacao: logs do Actions; outputs finais visiveis.
+
+### Modulo 11 (Refino)
+- Habilitar logs na task; adicionar alarms.
+- Reduzir privilegios da role OIDC.
+- Adicionar teste smoke pos-deploy.
+- Executar destroy e validar limpeza total.
+
+### Avaliacao
+- Rubrica: 1) app ok; 2) infra ok; 3) pipeline ok; 4) seguranca ok.
+- Desafios: auth no API Gateway; testes automatizados; SLOs/alarmes.
+
