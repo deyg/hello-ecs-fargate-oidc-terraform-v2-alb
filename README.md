@@ -16,7 +16,7 @@ Cliente ---> API Gateway (HTTP API, publico)
 
 ## Como rodar (resumo)
 1. **Bootstrap**: `terraform apply` em `bootstrap/` (S3 + DynamoDB + OIDC + Role).  
-2. Defina o secret `AWS_ACCOUNT_ID` no repositorio (conta da AWS usada pela role OIDC).  
+2. Defina o secret `ACCOUNT_ID` no repositorio (conta da AWS usada pela role OIDC).  
 3. **Push na main**: a pipeline cria VPC/ECR/ECS/ALB/API, gera a imagem e publica.  
 4. Saida: `api_url` -> `GET /hello` responde JSON.
 

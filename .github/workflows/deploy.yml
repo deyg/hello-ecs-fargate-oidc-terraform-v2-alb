@@ -7,6 +7,7 @@ permissions:
   contents: read
 env:
   AWS_REGION: sa-east-1
+  AWS_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
@@ -18,7 +19,7 @@ jobs:
       - name: Configure AWS (OIDC)
         uses: aws-actions/configure-aws-credentials@v5
         with:
-          role-to-assume: arn:aws:iam::269010808665:role/gha-oidc-terraform
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gha-oidc-terraform
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
