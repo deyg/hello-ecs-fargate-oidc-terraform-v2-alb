@@ -3,7 +3,12 @@ resource "aws_security_group" "vpclink" {
   name   = "sg-vpclink"
   vpc_id = module.vpc.vpc_id
 
-  egress { from_port = 0 to_port = 0 protocol = "-1" cidr_blocks = ["0.0.0.0/0"] }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   tags = { Name = "sg-vpclink" }
 }
 
@@ -20,7 +25,12 @@ resource "aws_security_group" "alb" {
     description     = "Allow from VPC Link SG"
   }
 
-  egress { from_port = 0 to_port = 0 protocol = "-1" cidr_blocks = ["0.0.0.0/0"] }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   tags = { Name = "sg-alb" }
 }
 
@@ -37,6 +47,11 @@ resource "aws_security_group" "svc" {
     description     = "Allow from ALB"
   }
 
-  egress { from_port = 0 to_port = 0 protocol = "-1" cidr_blocks = ["0.0.0.0/0"] }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   tags = { Name = "sg-ecs-svc" }
 }
