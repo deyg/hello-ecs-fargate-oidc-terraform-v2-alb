@@ -2,9 +2,9 @@
 const express = require('express');
 const app = express();
 
-// Permite servir tanto sem prefixo quanto com o stage (ex.: /prod)
-const stage = (process.env.API_STAGE || 'prod').replace(/^\/+/, '');
-const mountPoints = ['', stage ? `/${stage}` : ''].filter((value, index, self) => self.indexOf(value) === index);
+const DEFAULT_STAGE = 'prod';
+
+const normalizeStage = (stage) => stage.replace(/^\/+/, '');
 
 const createRouter = () => {
   const router = express.Router();
@@ -13,13 +13,25 @@ const createRouter = () => {
   router.get('/hello', (_, res) =>
     res.json({ message: 'Ola, mundo ECS Fargate (ALB)!', at: new Date().toISOString() })
   );
-  // Endpoint de saude para o ALB monitorar
   router.get('/health', (_, res) => res.status(200).send('OK'));
 
   return router;
 };
 
-mountPoints.forEach((base) => app.use(base || '/', createRouter()));
+const configureRoutes = (stage) => {
+  const normalizedStage = normalizeStage(stage || DEFAULT_STAGE);
+  const mountPoints = ['', normalizedStage ? `/${normalizedStage}` : ''];
+  const router = createRouter();
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`App up on ${port}`));
+  mountPoints.forEach((basePath) => {
+    const mount = basePath || '/';
+    app.use(mount, router);
+  });
+};
+
+configureRoutes(process.env.API_STAGE);
+
+const port = Number(process.env.PORT) || 3000;
+app.listen(port, () => {
+  console.log(`App up on ${port}`);
+});
