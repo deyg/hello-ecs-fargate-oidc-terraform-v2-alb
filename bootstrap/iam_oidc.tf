@@ -10,7 +10,10 @@ data "aws_iam_policy_document" "gha_assume" {
   statement {
     effect   = "Allow"
     actions  = ["sts:AssumeRoleWithWebIdentity"]
-    principals { type = "Federated" identifiers = [aws_iam_openid_connect_provider.github.arn] }
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github.arn]
+    }
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
@@ -30,4 +33,6 @@ resource "aws_iam_role_policy_attachment" "admin_temp" {
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
-output "gha_role_arn" { value = aws_iam_role.gha.arn }
+output "gha_role_arn" {
+  value = aws_iam_role.gha.arn
+}
