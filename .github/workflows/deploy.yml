@@ -1,0 +1,51 @@
+name: DEPLOY
+on:
+  push:
+    branches: [ "main" ]
+permissions:
+  id-token: write
+  contents: read
+env:
+  AWS_REGION: sa-east-1
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/gha-oidc-terraform
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 1) Garante VPC/ECR/ECS/ALB/API
+      - name: Terraform apply infra
+        working-directory: infra
+        run: |
+          terraform init -input=false
+          terraform apply -auto-approve -input=false
+
+      # 2) Login ECR, build e push imagem
+      - name: Login to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & Push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.ecr.outputs.registry }}/hello-ecs:${{ env.IMAGE_TAG }}
+
+      # 3) Reaplica com nova tag
+      - name: Terraform apply (image tag)
+        working-directory: infra
+        env:
+          TF_VAR_image_tag: ${{ env.IMAGE_TAG }}
+        run: terraform apply -auto-approve -input=false

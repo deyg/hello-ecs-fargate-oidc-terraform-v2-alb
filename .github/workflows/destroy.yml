@@ -1,0 +1,21 @@
+name: DESTROY
+on: { workflow_dispatch: {} }
+permissions: { id-token: write, contents: read }
+env: { AWS_REGION: sa-east-1 }
+
+jobs:
+  nuke:
+    runs-on: ubuntu-latest
+    environment: sandbox   # proteja com reviewers no GitHub
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/gha-oidc-terraform
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform destroy
+        working-directory: infra
+        run: |
+          terraform init -input=false
+          terraform destroy -auto-approve -input=false
