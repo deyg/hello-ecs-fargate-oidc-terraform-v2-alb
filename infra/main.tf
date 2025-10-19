@@ -8,10 +8,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "tfstate-7t-demo"
+    bucket         = "deyg-hello-ecs-oidc-tfstate"
     key            = "ecs-hello-v2/infra.tfstate"
     region         = "sa-east-1"
-    dynamodb_table = "tf-locks-7t-demo"
+    dynamodb_table = "deyg-hello-ecs-oidc-tf-locks"
     encrypt        = true
   }
 }
