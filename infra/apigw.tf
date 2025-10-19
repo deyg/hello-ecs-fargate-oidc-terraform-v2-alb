@@ -1,10 +1,10 @@
-# HTTP API PÚBLICO CHAMANDO SERVIÇO PRIVADO VIA VPC LINK
+# HTTP API publico chamando servico privado via VPC Link
 resource "aws_apigatewayv2_api" "api" {
   name          = "hello-http-api"
   protocol_type = "HTTP"
 }
 
-# VPC LINK COM SUB-REDE PRIVADA E SG PRÓPRIO
+# VPC Link com sub-rede privada e SG proprio
 resource "aws_apigatewayv2_vpc_link" "link" {
   name               = "hello-vpclink"
   subnet_ids         = module.vpc.private_subnets
@@ -17,7 +17,7 @@ resource "aws_apigatewayv2_integration" "int" {
   connection_type        = "VPC_LINK"
   connection_id          = aws_apigatewayv2_vpc_link.link.id
   integration_method     = "ANY"
-  # PARA ALB PRIVADO + HTTP API + VPC LINK, USE O ARN DO LISTENER HTTP:
+  # Para ALB privado + HTTP API + VPC Link, use o ARN do listener HTTP:
   integration_uri        = aws_lb_listener.http.arn
   payload_format_version = "1.0"
 }

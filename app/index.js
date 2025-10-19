@@ -4,9 +4,9 @@ const app = express();
 
 app.get('/', (_, res) => res.json({ ok: true }));
 app.get('/hello', (_, res) =>
-  res.json({ message: 'Olá, mundo ECS Fargate (ALB)!', at: new Date().toISOString() })
+  res.json({ message: 'Ola, mundo ECS Fargate (ALB)!', at: new Date().toISOString() })
 );
-// Endpoint de saúde para o ALB
+// Endpoint de saude para o ALB monitorar
 app.get('/health', (_, res) => res.status(200).send('OK'));
 
 const port = process.env.PORT || 3000;

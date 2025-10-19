@@ -1,4 +1,4 @@
-# ALB INTERNO PARA INTEGRAÇÃO VIA VPC LINK (API GATEWAY -> ALB -> ECS)
+# ALB interno para integracao via VPC Link (API Gateway -> ALB -> ECS)
 resource "aws_lb" "alb" {
   name               = "alb-hello"
   internal           = true
