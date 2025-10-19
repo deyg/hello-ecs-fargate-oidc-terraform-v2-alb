@@ -1,7 +1,15 @@
 name: DESTROY
-on: { workflow_dispatch: {} }
-permissions: { id-token: write, contents: read }
-env: { AWS_REGION: sa-east-1, AWS_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }} }
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: sa-east-1
+  AWS_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
 
 jobs:
   nuke:
@@ -9,11 +17,16 @@ jobs:
     environment: sandbox   # proteja com reviewers no GitHub
     steps:
       - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gha-oidc-terraform
           aws-region: ${{ env.AWS_REGION }}
-      - uses: hashicorp/setup-terraform@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: Terraform destroy
         working-directory: infra
         run: |
