@@ -33,7 +33,6 @@ resource "aws_apigatewayv2_stage" "prod" {
   name        = "prod"
   auto_deploy = true
 }
-
 output "invoke_url" {
-  value = "${aws_apigatewayv2_api.api.api_endpoint}/hello"
+  value = "${aws_apigatewayv2_api.api.api_endpoint}/${aws_apigatewayv2_stage.prod.name}/hello"
 }
